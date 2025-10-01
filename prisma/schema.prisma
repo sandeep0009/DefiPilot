@@ -41,7 +41,7 @@ model Wallets{
   publicAddress       String
   userId              String
   user                User            @relation(fields: [userId],references: [id])
-  createAt            DateTime
+  createAt            DateTime       
 }
 
 
