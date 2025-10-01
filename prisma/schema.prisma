@@ -1,8 +1,4 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
   provider = "prisma-client-js"
@@ -10,6 +6,81 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider = "sqlite"
+  url      = "file:../database.db"
+}
+
+
+
+model User{
+  id            String        @id @default(uuid())
+  teleUserId    String
+  wallet        Wallets[]
+  rules         Rules[]
+  logs          Logs[]
+  createAt      DateTime
+}
+
+
+model Rules{
+  id              String          @id @default(uuid())
+  userId          String
+  walletId        String
+  action          RuleType
+  condidtion      ConditionType
+  status          StatusType
+  user            User            @relation(fields: [userId] ,references: [id])
+  createAt        DateTime
+
+
+  @@index([userId])
+}
+
+model Wallets{
+  id                  String          @id @default(uuid())
+  publicAddress       String
+  userId              String
+  user                User            @relation(fields: [userId],references: [id])
+  createAt            DateTime
+}
+
+
+model Logs{
+  id              String          @id @default(uuid())
+  txnHash         String
+  logsstatus      LogsType 
+  gas             Float  
+  userId          String
+  user            User           @relation(fields: [userId],references: [id]) 
+  createAt        DateTime
+
+
+  @@index([userId])
+}
+enum RuleType{
+  swap
+  transfer
+  alert
+
+}
+
+enum ConditionType{
+  priceThreshold
+  timeSchedule
+  eventTrigger
+}
+
+
+
+enum StatusType{
+  active 
+  paused
+  failed
+}
+
+
+enum LogsType{
+  failure
+  successfull
+
 }
